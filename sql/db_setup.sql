@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS Review (
     FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID) ON DELETE CASCADE
 );
 
--- Insert Default Admin (Password: admin123 hashed using SHA-256)
+-- Insert Default Admin username:admin (Password: admin hashed using SHA-256)
 INSERT IGNORE INTO Admin (Name, Username, Password) 
 VALUES ('Super Admin', 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918');
 
