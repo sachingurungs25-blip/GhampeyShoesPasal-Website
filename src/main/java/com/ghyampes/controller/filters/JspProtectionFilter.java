@@ -47,6 +47,22 @@ public class JspProtectionFilter implements Filter {
         } else if (path.endsWith("edit_product.jsp")) {
             String id = req.getParameter("id");
             res.sendRedirect(req.getContextPath() + "/ShoeServlet?action=showEdit" + (id != null ? "&id=" + id : ""));
+        } else if (path.endsWith("about.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/AboutServlet");
+        } else if (path.endsWith("careers.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/CareersServlet");
+        } else if (path.endsWith("privacy.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/PrivacyServlet");
+        } else if (path.endsWith("terms.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/TermsServlet");
+        } else if (path.endsWith("contact.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/ContactServlet");
+        } else if (path.endsWith("order_status.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/OrderStatusServlet");
+        } else if (path.endsWith("returns.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/ReturnsServlet");
+        } else if (path.endsWith("size_guide.jsp")) {
+            res.sendRedirect(req.getContextPath() + "/SizeGuideServlet");
         } else {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Direct access to JSP pages is forbidden.");
         }

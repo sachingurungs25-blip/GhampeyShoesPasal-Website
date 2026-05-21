@@ -350,6 +350,56 @@
         .btn-action.delete:hover {
             background: #fecaca;
         }
+
+        /* Responsive Mobile Styles */
+        @media (max-width: 1024px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 20px 24px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .brand-logo {
+                margin-bottom: 0;
+            }
+            .nav-menu {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .header-actions {
+                width: 100%;
+            }
+            .btn-view-home {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>

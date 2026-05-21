@@ -9,212 +9,158 @@
 <%@ page import="com.ghyampes.dao.ReviewDAO, com.ghyampes.model.Review, com.ghyampes.model.User" %>
 <% 
     String idParam = request.getParameter("id");
-    List<CartItem> cartList = (List<CartItem>) session.getAttribute("cart"); int cartSize = (cartList != null) ? cartList.size() : 0; 
-Shoe shoe = null;
-    User user = (User) session.getAttribute("user");
-    List<Review> reviews = new java.util.ArrayList<>();
-    if(shoe != null) {
-        reviews = new ReviewDAO().getReviewsByProduct(shoe.getId());
-    }
-
+    Shoe shoe = null;
     if(idParam != null && !idParam.isEmpty()) {
         shoe = new ShoeDAO().getShoeById(Integer.parseInt(idParam));
     }
     if (shoe == null) {
-        response.sendRedirect("../HomeServlet");
+        response.sendRedirect(request.getContextPath() + "/HomeServlet");
         return;
     }
+    
+    User user = (User) session.getAttribute("user");
+    List<Review> reviews = new ReviewDAO().getReviewsByProduct(shoe.getId());
+    
     String img = (shoe.getImageUrl() != null && !shoe.getImageUrl().isEmpty()) ? shoe.getImageUrl() : "images/running_shoe_1777806317504.png";
-        if (img != null && img.startsWith("images/")) { img = "../" + img; }
+    if (img != null && img.startsWith("images/")) { 
+        img = request.getContextPath() + "/" + img; 
+    }
+    
+    request.setAttribute("pageTitle", shoe.getItemName() + " - Ghampey Shoes Pasal");
 %>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><%= shoe.getItemName() %> - Ghampey Shoes Pasal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background: #fff; margin:0; padding:0; color:#333; }
-        
-        /* Navbar matching index */
-        nav { padding: 20px 48px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items:center; }
-        nav a { text-decoration: none; color: #000; font-weight: 600; margin-right: 20px;}
-        
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        
-        /* Left side - Image */
-        .image-section { background: #f9f9f9; padding: 20px; border-radius: 8px; text-align:center; }
-        .image-section img { max-width: 100%; height: auto; border-radius: 8px; }
-        
-        /* Right side - Details */
-        .details-section { padding-top: 20px; }
-        .title { font-size: 24px; font-weight: 600; margin-bottom: 10px; color:#212121; line-height:1.3; }
-        .ratings { color: #f5a623; font-size: 14px; margin-bottom: 15px; }
-        .ratings span { color: #1890ff; margin-left: 10px; cursor:pointer; }
-        
-        .brand-info { font-size: 13px; color: #757575; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
-        .brand-info span { color: #1890ff; cursor:pointer;}
-        
-        .price-area { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
-        .price { font-size: 32px; font-weight: 500; color: #f57224; }
-        .before-price { font-size: 16px; color: #9e9e9e; text-decoration: line-through; margin-left: 10px; }
-        .discount { font-size: 14px; color: #212121; margin-left: 5px; }
-        
-        .option-group { margin-bottom: 25px; }
-        .option-label { font-size: 14px; color: #757575; margin-bottom: 10px; display: block; }
-        
-        /* Size Boxes */
-        .size-options { display: flex; gap: 10px; }
-        .size-box { 
-            border: 1px solid #dadada; padding: 8px 16px; font-size: 14px; cursor: pointer;
-            background: #fff; border-radius: 2px; color: #212121;
-        }
-        .size-box:hover { border-color: #f57224; color: #f57224; }
-        .size-box.active { border-color: #f57224; color: #f57224; }
-        
-        /* Quantity */
-        .qty-wrapper { display: flex; align-items: center; gap: 15px; }
-        .qty-controls { display: flex; border: 1px solid #eee; border-radius: 2px; overflow:hidden;}
-        .qty-btn { background: #f5f5f5; border: none; padding: 10px 15px; cursor: pointer; font-size: 16px; color: #757575;}
-        .qty-btn:hover { background: #e0e0e0; }
-        .qty-input { width: 50px; text-align: center; border: none; font-size: 16px; border-left: 1px solid #eee; border-right: 1px solid #eee;}
-        
-        /* Buttons */
-        .action-buttons { display: flex; gap: 15px; margin-top: 30px; }
-        .btn-buy { flex: 1; background: #26abd4; color: white; border: none; padding: 14px; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 2px;}
-        .btn-buy:hover { background: #1c92b8; }
-        .btn-cart { flex: 1; background: #f57224; color: white; border: none; padding: 14px; font-size: 16px; font-weight: 500; cursor: pointer; border-radius: 2px;}
-        .btn-cart:hover { background: #d05c1a; }
-    </style>
-</head>
-<body>
+<jsp:include page="/pages/header.jsp" />
 
-    <nav>
-        <div>
-            <a href="../HomeServlet" style="font-weight: 900; font-size:20px; text-transform:uppercase;">Ghyampe's <span style="color:#c8ff00; background:#0a0a0a; padding:2px 8px; border-radius:4px;">SHOES</span></a>
-        </div>
-        <div><a href="../CartServlet" style="color:#f57224;">🛒 Cart (<%= cartSize %>)</a><a href="../HomeServlet">Back to Home</a></div>
-    </nav>
-
-    <div class="container">
-        <!-- Left Image -->
-        <div class="image-section">
-            <img src="<%= img %>" alt="<%= shoe.getItemName() %>">
+<div class="container details-grid">
+    <!-- Left Image -->
+    <div class="image-section">
+        <img src="<%= img %>" alt="<%= shoe.getItemName() %>">
+    </div>
+    
+    <!-- Right Details -->
+    <div class="details-section">
+        <h1 class="title"><%= shoe.getItemName() %></h1>
+        
+        <div class="ratings" style="margin-bottom:20px;">
+            <% if(reviews.isEmpty()) { %>
+                <span style="color:var(--gray-500);">No reviews yet</span>
+            <% } else { %>
+                ⭐ <a href="#reviews" style="color:var(--black); font-weight:700; text-decoration:underline;"><%= reviews.size() %> Reviews</a>
+            <% } %>
         </div>
         
-        <!-- Right Details -->
-        <div class="details-section">
-            <div class="title"><%= shoe.getItemName() %></div>
+        <div class="brand-info" style="font-size:15px; margin-bottom:20px; border-bottom:1px solid var(--gray-200); padding-bottom:20px;">
+            <strong>Description:</strong> 
+            <p style="color:#444; margin-top:8px; line-height:1.6;"><%= shoe.getDescription() %></p>
+        </div>
+        
+        <div style="margin-bottom:20px; font-weight:700; font-size:14px; color:<%= shoe.getStock() > 0 ? "var(--accent-green)" : "var(--accent-red)" %>">
+            Availability: <%= shoe.getStock() > 0 ? shoe.getStock() + " In Stock" : "Out of Stock" %>
+        </div>
+        
+        <div class="price-area" style="margin-bottom:24px; border-bottom:1px solid var(--gray-200); padding-bottom:20px;">
+            <div class="price" style="font-size:32px; font-weight:800; color:var(--black);">Rs. <%= (int)shoe.getPrice() %></div>
+            <% if(shoe.getBeforePrice() > 0) { 
+                int discount = (int)(((shoe.getBeforePrice() - shoe.getPrice()) / shoe.getBeforePrice()) * 100);
+            %>
+                <div style="margin-top:6px;">
+                    <span class="before-price" style="font-size:16px; color:var(--gray-500); text-decoration:line-through;">Rs. <%= (int)shoe.getBeforePrice() %></span>
+                    <span class="discount" style="font-size:13px; background:var(--accent-red); color:white; padding:2px 8px; border-radius:4px; font-weight:700; margin-left:8px;">-<%= discount %>% OFF</span>
+                </div>
+            <% } %>
+        </div>
+        
+        <form action="<%= request.getContextPath() %>/CartServlet" method="post">
+            <input type="hidden" name="productId" value="<%= shoe.getId() %>">
             
-            <div class="ratings">
-                <% if(reviews.isEmpty()) { %>
-                    <span style="color:#757575;">No reviews yet</span>
+            <div class="option-group">
+                <span class="option-label">Select Size</span>
+                
+                <div class="size-options">
+                    <label style="cursor:pointer;">
+                        <input type="radio" name="size" value="EU: 39" checked style="display:none;">
+                        <div class="size-box active" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 39</div>
+                    </label>
+                    <label style="cursor:pointer;">
+                        <input type="radio" name="size" value="EU: 40" style="display:none;">
+                        <div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 40</div>
+                    </label>
+                    <label style="cursor:pointer;">
+                        <input type="radio" name="size" value="EU: 41" style="display:none;">
+                        <div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 41</div>
+                    </label>
+                    <label style="cursor:pointer;">
+                        <input type="radio" name="size" value="EU: 42" style="display:none;">
+                        <div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 42</div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="option-group" style="margin-top:24px;">
+                <div class="qty-wrapper">
+                    <span class="option-label" style="margin:0;">Quantity</span>
+                    <div class="qty-controls">
+                        <button type="button" class="qty-btn" onclick="let q=document.getElementById('qty'); if(q.value>1)q.value--;">-</button>
+                        <input type="text" name="quantity" id="qty" value="1" class="qty-input" readonly>
+                        <button type="button" class="qty-btn" onclick="let q=document.getElementById('qty'); if(q.value < <%= shoe.getStock() %>) q.value++;">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons" style="margin-top:32px;">
+                <% if(shoe.getStock() > 0) { %>
+                    <button type="submit" name="action" value="buy_now" class="btn-filled" style="padding:14px; font-size:16px;">Buy Now</button>
+                    <button type="submit" name="action" value="add" class="cta-primary" style="padding:14px; font-size:16px;">Add to Cart</button>
                 <% } else { %>
-                    ⭐ <a href="#reviews" style="color:#1890ff; text-decoration:none;"><%= reviews.size() %> Reviews</a>
+                    <button type="button" class="btn-outline" style="background:#f5f5f5; color:var(--gray-500); border-color:var(--gray-200); cursor:not-allowed; grid-column: span 2;">Out of Stock</button>
                 <% } %>
             </div>
-            
-            <div class="brand-info">
-                <strong>Description:</strong> <span style="color:#333;"><%= shoe.getDescription() %></span>
-            </div>
-            <div style="margin-bottom:20px; font-weight:600; color:<%= shoe.getStock()>0?"#52c41a":"red" %>">Availability: <%= shoe.getStock()>0 ? shoe.getStock() + " In Stock" : "Out of Stock" %></div>
-            
-            <div class="price-area">
-                <div class="price">Rs. <%= (int)shoe.getPrice() %></div>
-                <% if(shoe.getBeforePrice() > 0) { 
-                    int discount = (int)(((shoe.getBeforePrice() - shoe.getPrice()) / shoe.getBeforePrice()) * 100);
-                %>
-                    <div>
-                        <span class="before-price">Rs. <%= (int)shoe.getBeforePrice() %></span>
-                        <span class="discount">-<%= discount %>%</span>
-                    </div>
-                <% } %>
-            </div>
-            
-            <form action="../CheckoutServlet" method="post">
-                <input type="hidden" name="productId" value="<%= shoe.getId() %>">
-                
-                <div class="option-group">
-                    <span class="option-label">Size</span>
-                    
-                    <div class="size-options">
-                        <label style="cursor:pointer;"><input type="radio" name="size" value="EU: 39" checked style="display:none;"><div class="size-box active" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 39</div></label>
-                        <label style="cursor:pointer;"><input type="radio" name="size" value="EU: 40" style="display:none;"><div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 40</div></label>
-                        <label style="cursor:pointer;"><input type="radio" name="size" value="EU: 41" style="display:none;"><div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 41</div></label>
-                        <label style="cursor:pointer;"><input type="radio" name="size" value="EU: 42" style="display:none;"><div class="size-box" onclick="document.querySelectorAll('.size-box').forEach(b=>b.classList.remove('active')); this.classList.add('active');">EU: 42</div></label>
-                    </div>
-                </div>
-                
-                <div class="option-group">
-                    <div class="qty-wrapper">
-                        <span class="option-label" style="margin:0;">Quantity</span>
-                        <div class="qty-controls">
-                            <button type="button" class="qty-btn" onclick="let q=document.getElementById('qty'); if(q.value>1)q.value--;">-</button>
-                            <input type="text" name="quantity" id="qty" value="1" class="qty-input" readonly>
-                            <button type="button" class="qty-btn" onclick="let q=document.getElementById('qty'); if(q.value < <%= shoe.getStock() %>) q.value++;">+</button>
-                        </div>
-                    </div>
-                </div>
-                
-                
-                <div class="action-buttons">
-                    <% if(shoe.getStock() > 0) { %>
-                        <button type="submit" name="action" value="buy_now" class="btn-buy" formaction="../CartServlet">Buy Now</button>
-                        <button type="submit" name="action" value="add" class="btn-cart" formaction="../CartServlet">Add to Cart</button>
-                    <% } else { %>
-                        <button type="button" class="btn-buy" style="background:#999; cursor:not-allowed;">Out of Stock</button>
-                    <% } %>
-                </div>
+        </form>
+    </div>
+</div>
 
+<!-- Reviews Section -->
+<div id="reviews" class="container" style="border-top:1px solid var(--gray-200); padding-top:60px;">
+    <h2 style="font-size:24px; font-weight:800; margin-bottom:30px;">Product Reviews</h2>
+    
+    <% if(reviews.isEmpty()) { %>
+        <p style="color:var(--gray-500);">No reviews yet. Be the first to review this product!</p>
+    <% } else { 
+        for(Review r : reviews) {
+    %>
+        <div style="border-bottom:1px solid var(--gray-200); padding-bottom:20px; margin-bottom:20px;">
+            <div style="font-weight:700; font-size:16px; margin-bottom:4px; color:var(--black);"><%= r.getMemberName() %></div>
+            <div style="color:#f5a623; font-size:13px; margin-bottom:8px;"><%= r.getRatingType() %></div>
+            <p style="color:#555; font-size:14px; line-height:1.6; margin:0;"><%= r.getComments() %></p>
+        </div>
+    <% } } %>
+    
+    <% if(user != null && "member".equals(user.getRole())) { %>
+        <div style="background:var(--gray-100); border:1px solid var(--gray-200); padding:30px; border-radius:12px; margin-top:40px;">
+            <h3 style="margin-top:0; margin-bottom:20px; font-weight:800;">Write a Review</h3>
+            <form action="<%= request.getContextPath() %>/ReviewServlet" method="post">
+                <input type="hidden" name="productId" value="<%= shoe.getId() %>">
+                <div class="form-group">
+                    <label>Rating</label>
+                    <select name="rating" style="width:100%; max-width:240px; background:white;">
+                        <option value="⭐⭐⭐⭐⭐ Excellent">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="⭐⭐⭐⭐ Good">⭐⭐⭐⭐ Good</option>
+                        <option value="⭐⭐⭐ Average">⭐⭐⭐ Average</option>
+                        <option value="⭐⭐ Poor">⭐⭐ Poor</option>
+                        <option value="⭐ Terrible">⭐ Terrible</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Review Notes</label>
+                    <textarea name="comments" rows="4" placeholder="Share your experience with these shoes..." style="background:white;" required></textarea>
+                </div>
+                <button type="submit" class="btn-filled" style="width:auto; padding:12px 30px;">Submit Review</button>
             </form>
         </div>
-    </div>
+    <% } else { %>
+        <div style="background:rgba(200,255,0,0.1); border:1px solid var(--gray-200); padding:20px; border-radius:12px; margin-top:40px; text-align:center;">
+            <p style="margin:0; font-size:14px; font-weight:600; color:var(--black);">Please <a href="<%= request.getContextPath() %>/LoginServlet" style="text-decoration:underline; font-weight:700; color:var(--black);">Sign In</a> to write a review.</p>
+        </div>
+    <% } %>
+</div>
 
-
-    <!-- Reviews Section -->
-    <div id="reviews" style="max-width: 1200px; margin: 60px auto; padding: 0 20px;">
-        <h2 style="font-size:24px; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:30px;">Product Reviews</h2>
-        
-        <% if(reviews.isEmpty()) { %>
-            <p style="color:#757575;">No reviews yet. Be the first to review this product!</p>
-        <% } else { 
-            for(Review r : reviews) {
-        %>
-            <div style="border-bottom:1px solid #f0f0f0; padding-bottom:20px; margin-bottom:20px;">
-                <div style="font-weight:600; font-size:16px; margin-bottom:5px;"><%= r.getMemberName() %></div>
-                <div style="color:#f5a623; font-size:14px; margin-bottom:10px;"><%= r.getRatingType() %></div>
-                <p style="color:#555; font-size:14px; line-height:1.6; margin:0;"><%= r.getComments() %></p>
-            </div>
-        <% } } %>
-        
-        <% if(user != null && "member".equals(user.getRole())) { %>
-            <div style="background:#f9f9f9; padding:30px; border-radius:8px; margin-top:40px;">
-                <h3 style="margin-top:0; margin-bottom:20px;">Write a Review</h3>
-                <form action="../ReviewServlet" method="post">
-                    <input type="hidden" name="productId" value="<%= shoe.getId() %>">
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; margin-bottom:8px; font-weight:600;">Rating</label>
-                        <select name="rating" style="padding:10px; width:200px; border:1px solid #ddd; border-radius:4px;">
-                            <option value="⭐⭐⭐⭐⭐ Excellent">⭐⭐⭐⭐⭐ Excellent</option>
-                            <option value="⭐⭐⭐⭐ Good">⭐⭐⭐⭐ Good</option>
-                            <option value="⭐⭐⭐ Average">⭐⭐⭐ Average</option>
-                            <option value="⭐⭐ Poor">⭐⭐ Poor</option>
-                            <option value="⭐ Terrible">⭐ Terrible</option>
-                        </select>
-                    </div>
-                    <div style="margin-bottom:15px;">
-                        <label style="display:block; margin-bottom:8px; font-weight:600;">Review Note</label>
-                        <textarea name="comments" rows="4" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;" required></textarea>
-                    </div>
-                    <button type="submit" style="background:#0a0a0a; color:white; border:none; padding:12px 24px; font-weight:600; border-radius:4px; cursor:pointer;">Submit Review</button>
-                </form>
-            </div>
-        <% } else { %>
-            <div style="background:#f0f8ff; padding:20px; border-radius:8px; margin-top:40px; text-align:center;">
-                <p style="margin:0; color:#333;">Please <a href="../LoginServlet" style="color:#1890ff; font-weight:600;">login</a> to write a review.</p>
-            </div>
-        <% } %>
-    </div>
-
-</body>
-</html>
+<jsp:include page="/pages/footer.jsp" />
