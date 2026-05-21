@@ -1,0 +1,458 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.ghyampes.model.CartItem, java.util.List" %>
+<% List<CartItem> cartList = (List<CartItem>) session.getAttribute("cart"); int cartSize = (cartList != null) ? cartList.size() : 0; %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Size Guide - Ghampey Shoes Pasal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-500: #737373;
+            --accent: #c8ff00;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--white);
+            color: var(--black);
+            overflow-x: hidden;
+        }
+
+        /* ---- NAVBAR ---- */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 999;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 48px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            text-decoration: none;
+            color: var(--black);
+            text-transform: uppercase;
+        }
+
+        .nav-logo span {
+            color: var(--black);
+            background: var(--black);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 36px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--black);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--gray-500); }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-outline {
+            text-decoration: none;
+            color: var(--black);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border: 1.5px solid var(--black);
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-filled {
+            text-decoration: none;
+            background: var(--black);
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+
+        .btn-filled:hover { background: #333; }
+
+        /* ---- HEADER ---- */
+        .header-section {
+            background: var(--black);
+            color: var(--white);
+            padding: 120px 48px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(200,255,0,0.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .header-section h1 {
+            font-size: clamp(36px, 5vw, 64px);
+            font-weight: 900;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .header-section h1 span {
+            color: var(--accent);
+        }
+
+        .header-section p {
+            font-size: 18px;
+            color: #a0a0a0;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ---- SIZE CHART CONTENT ---- */
+        .chart-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        .chart-container h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--black);
+            letter-spacing: -0.5px;
+        }
+
+        .chart-container p {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 40px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 50px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        th {
+            background: var(--black);
+            color: var(--white);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background: var(--gray-100);
+        }
+
+        tr:hover {
+            background: rgba(200,255,0,0.05);
+        }
+
+        /* Instructions */
+        .instructions {
+            background: var(--gray-100);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .instructions h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--black);
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            color: #555;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .instructions ol li {
+            margin-bottom: 12px;
+        }
+
+        /* ---- FOOTER ---- */
+        footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 60px 48px 32px;
+            margin-top: 80px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: #737373;
+            margin-top: 16px;
+            max-width: 280px;
+            line-height: 1.7;
+        }
+
+        .footer-col h4 {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #737373;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul { list-style: none; }
+
+        .footer-col ul li { margin-bottom: 12px; }
+
+        .footer-col ul li a {
+            text-decoration: none;
+            color: #a0a0a0;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-col ul li a:hover { color: var(--white); }
+
+        .footer-bottom {
+            border-top: 1px solid #1f1f1f;
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 13px;
+            color: #737373;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .nav-links { display: none; }
+            .header-section { padding: 100px 24px 60px; }
+            footer { padding: 48px 24px 24px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <a href="../HomeServlet" class="nav-logo">Ghampey <span>SHOES PASAL</span></a>
+    <ul class="nav-links">
+        <li><a href="../ProductServlet?category=Men">Men</a></li>
+        <li><a href="../ProductServlet?category=Women">Women</a></li>
+        <li><a href="../ProductServlet?category=Kids">Kids</a></li>
+        <li><a href="../ProductServlet?category=Sale">Sale</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="../CartServlet" style="font-weight:700; color:#0a0a0a; text-decoration:none; margin-right:15px;">🛒 Cart (<%= cartSize %>)</a>
+        
+        <% if(session.getAttribute("user") != null) { %>
+            <a href="../UserProfileServlet" class="btn-outline">My Profile</a>
+            <a href="../LogoutServlet" class="btn-filled">Logout</a>
+        <% } else { %>
+            <a href="../LoginServlet" class="btn-outline">Sign In</a>
+            <a href="../RegisterServlet" class="btn-filled">Join Us</a>
+        <% } %>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<section class="header-section">
+    <h1>Size <span>Guide</span></h1>
+    <p>Find the perfect fit. Use our standard conversion chart to find your ideal shoe size.</p>
+</section>
+
+<!-- CHART CONTENT -->
+<section class="chart-container">
+    <h2>Standard Footwear Conversion</h2>
+    <p>At Ghampey Shoes, our products are made following international standard sizing rules. We highly recommend measuring your foot length in centimeters if you are unsure of your exact EU/US size.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>EU Size</th>
+                <th>US (Men)</th>
+                <th>US (Women)</th>
+                <th>UK Size</th>
+                <th>Foot Length (CM)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>38</td>
+                <td>5.5</td>
+                <td>7</td>
+                <td>5</td>
+                <td>24.0 cm</td>
+            </tr>
+            <tr>
+                <td>39</td>
+                <td>6.5</td>
+                <td>8</td>
+                <td>6</td>
+                <td>24.5 cm</td>
+            </tr>
+            <tr>
+                <td>40</td>
+                <td>7.5</td>
+                <td>9</td>
+                <td>6.5</td>
+                <td>25.0 cm</td>
+            </tr>
+            <tr>
+                <td>41</td>
+                <td>8</td>
+                <td>9.5</td>
+                <td>7</td>
+                <td>25.5 cm</td>
+            </tr>
+            <tr>
+                <td>42</td>
+                <td>9</td>
+                <td>10.5</td>
+                <td>8</td>
+                <td>26.0 cm</td>
+            </tr>
+            <tr>
+                <td>43</td>
+                <td>10</td>
+                <td>11.5</td>
+                <td>9</td>
+                <td>27.0 cm</td>
+            </tr>
+            <tr>
+                <td>44</td>
+                <td>11</td>
+                <td>12.5</td>
+                <td>10</td>
+                <td>28.0 cm</td>
+            </tr>
+            <tr>
+                <td>45</td>
+                <td>12</td>
+                <td>13.5</td>
+                <td>11</td>
+                <td>29.0 cm</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="instructions">
+        <h3>How to Measure Your Foot Length</h3>
+        <ol>
+            <li>Place a sheet of blank white paper on the floor against a flat wall.</li>
+            <li>Stand flat on the paper with your heel firmly touching the wall behind you.</li>
+            <li>Use a pencil to draw a line marking the longest point of your foot (usually the big toe).</li>
+            <li>Use a ruler to measure the distance in centimeters from the edge of the paper to the line.</li>
+            <li>Compare your measurement with the Foot Length column in the table above to find your Ghampey size!</li>
+        </ol>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="../HomeServlet" class="nav-logo" style="color:white;">Ghampey <span>SHOES PASAL</span></a>
+            <p>Nepal's premium destination for authentic footwear. Based in Pokhara, delivering excellence across the country.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Help</h4>
+            <ul>
+                <li><a href="../OrderStatusServlet">Order Status</a></li>
+                <li><a href="../ReturnsServlet">Returns</a></li>
+                <li><a href="../SizeGuideServlet">Size Guide</a></li>
+                <li><a href="../ContactServlet">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>About</h4>
+            <ul>
+                <li><a href="../AboutServlet">Our Story</a></li>
+                <li><a href="../CareersServlet">Careers</a></li>
+                <li><a href="../PrivacyServlet">Privacy Policy</a></li>
+                <li><a href="../TermsServlet">Terms of Use</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Ghampey Shoes Pasal. All Rights Reserved.</p>
+        <p>Pokhara, Nepal</p>
+    </div>
+</footer>
+
+</body>
+</html>
